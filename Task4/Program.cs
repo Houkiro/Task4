@@ -15,9 +15,11 @@ builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 builder.Services.ConfigureLoggerService();
 
-builder.Services.AddScoped<IAuthorRepository, InMemoryAuthorRepository>();
+builder.Services.AddSingleton<IAuthorRepository, InMemoryAuthorRepository>();
+builder.Services.AddSingleton<IBookRepository, InMemoryBookRepository>();
 
 builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IBookService, BookService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

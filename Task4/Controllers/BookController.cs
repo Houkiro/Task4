@@ -1,12 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BLL.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Task4.Controllers
 {
-    public class BookController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class BookController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IBookService _bookService;
+        private readonly IAuthorService _authorService;
+        public BookController(IBookService bookService, IAuthorService authorService)
         {
-            return View();
-        }
+            _bookService = bookService;
+            _authorService = authorService;
+        }     
     }
 }

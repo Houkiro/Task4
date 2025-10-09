@@ -8,6 +8,6 @@ namespace BLL.Interfaces
         Task<AuthorDto> GetByIdAsync(int id);
         Task<AuthorDto> CreateAsync(AuthorDto author);
         Task<AuthorDto> UpdateAsync(int id, AuthorDto author);
-        Task DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id);
     }
 }
