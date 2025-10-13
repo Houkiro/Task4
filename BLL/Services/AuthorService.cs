@@ -1,4 +1,5 @@
-﻿using BLL.Interfaces;
+﻿using AutoMapper;
+using BLL.Interfaces;
 using Core.Entities.Model;
 using Core.Interfaces;
 using Shared.DTO;
@@ -7,83 +8,64 @@ namespace BLL.Services
 {
     public class AuthorService : IAuthorService
     {
-        private readonly IAuthorRepository _authorRepository;
+        private readonly IRepositoryManager _repository;
+        private readonly ILoggerManager _logger;
+        private readonly IMapper _mapper;
 
-        public AuthorService(IAuthorRepository authorRepository)
+        public AuthorService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
         {
-            _authorRepository = authorRepository ?? throw new ArgumentNullException(nameof(authorRepository));
+            _repository = repository;
+            _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<AuthorDto>> GetAllAsync()
         {
-            var authors = await _authorRepository.GetAllAsync();
-            return authors.Select(a => new AuthorDto
-            {
-                Id = a.Id,
-                Name = a.Name,
-                DateOfBirth = a.DateOfBirth
-            });
+            var authors = await _repository.Author.GetAllAsync();
+            var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
+            return authorsDto;
         }
 
         public async Task<AuthorDto?> GetByIdAsync(int id)
         {
-            var author = await _authorRepository.GetByIdAsync(id);
+            var author = await _repository.Author.GetByIdAsync(id);
             if (author == null) return null;
-
-            return new AuthorDto
-            {
-                Id = author.Id,
-                Name = author.Name,
-                DateOfBirth = author.DateOfBirth
-            };
+            var authorDto = _mapper.Map<AuthorDto>(author);
+            return authorDto;
         }
 
         public async Task<AuthorDto> CreateAsync(AuthorDto authorDto)
         {
-            var author = new Author
-            {
-                Name = authorDto.Name,
-                DateOfBirth = authorDto.DateOfBirth,
-                Books = new List<Book>()
-            };
+            var author = _mapper.Map<Author>(authorDto);
+            author.Books = new List<Book>();
 
-            var created = await _authorRepository.CreateAsync(author);
-
-            return new AuthorDto
-            {
-                Id = created.Id,
-                Name = created.Name,
-                DateOfBirth = created.DateOfBirth
-            };
+            var created = await _repository.Author.CreateAsync(author);
+            var createdDto = _mapper.Map<AuthorDto>(created);
+            return createdDto;
         }
 
         public async Task<AuthorDto?> UpdateAsync(int id, AuthorDto authorDto)
         {
-            var existingAuthor = await _authorRepository.GetByIdAsync(id);
+            var existingAuthor = await _repository.Author.GetByIdAsync(id);
             if (existingAuthor == null)
                   throw new ArgumentException($"Author with ID {id} not found");
 
             existingAuthor.Name = authorDto.Name;
             existingAuthor.DateOfBirth = authorDto.DateOfBirth;
 
-            await _authorRepository.UpdateAsync(id, existingAuthor);
+            await _repository.Author.UpdateAsync(id, existingAuthor);
 
-            return new AuthorDto
-            {
-                Id = existingAuthor.Id,
-                Name = existingAuthor.Name,
-                DateOfBirth = existingAuthor.DateOfBirth
-            };
+            return _mapper.Map<AuthorDto>(existingAuthor);
         }
 
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var author = await _authorRepository.GetByIdAsync(id);
+            var author = await _repository.Author.GetByIdAsync(id);
             if (author is null)
                 throw new ArgumentException($"Author with ID {id} not found");
 
-            await _authorRepository.DeleteAsync(id);
+            await _repository.Author.DeleteAsync(id);
             return true;
         }
 

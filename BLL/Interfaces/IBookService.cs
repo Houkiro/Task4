@@ -8,6 +8,6 @@ namespace BLL.Interfaces
         Task<BookDto> GetBooksForAuthorByIdAsync(int authorId, int id);
         Task<BookDto> CreateBookForAuthor(int authorId, BookDto book);
         Task<BookDto> UpdateBookForAuthorAsync(int authorId, int id, BookDto book);
-        Task<bool> DeleteBookForAuthor(int authorId, int id);
+        Task<bool> DeleteBookForAuthorAsync(int authorId, int id);
     }
 }
