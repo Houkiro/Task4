@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BLL.Interfaces;
 using Core.Entities.Model;
+using Core.Exceptions;
 using Core.Interfaces;
 using Shared.DTO;
 
@@ -21,7 +22,7 @@ namespace BLL.Services
         {
             var author = await _repository.Author.GetByIdAsync(authorId);
             if (author is null)
-                throw new ArgumentException($"Author with ID {authorId} not found");
+                throw new AuthorNotFoundException(authorId);
 
             var books = await _repository.Book.GetAllBooksByAuthorIdAsync(authorId);
             var booksDto = _mapper.Map<IEnumerable<BookDto>>(books);
@@ -32,8 +33,10 @@ namespace BLL.Services
         {
             var author = await _repository.Author.GetByIdAsync(authorId);
             if(author is null)
-                throw new ArgumentException($"Author with ID {authorId} not found");
+                throw new AuthorNotFoundException(authorId);
             var book = await _repository.Book.GetBookByAuthorIdAsync(authorId, id);
+            if (book is null)
+                throw new BookNotFoundException(id);
             var bookDto = _mapper.Map<BookDto>(book);
             return bookDto;
         }
@@ -42,7 +45,7 @@ namespace BLL.Services
         {
             var author = await _repository.Author.GetByIdAsync(authorId);
             if (author is null)
-                throw new ArgumentException($"Author with ID {authorId} not found");
+                throw new AuthorNotFoundException(authorId);
             var book = _mapper.Map<Book>(bookDto);
 
             var created = await _repository.Book.CreateAsync(author.Id, book);
@@ -53,10 +56,10 @@ namespace BLL.Services
         {
             var author = await _repository.Author.GetByIdAsync(authorId);
             if (author is null)
-                throw new ArgumentException($"Author with ID {authorId} not found");
+                throw new AuthorNotFoundException(authorId);
             var existingBook = await _repository.Book.GetBookByAuthorIdAsync(author.Id, id);
             if (existingBook is null)
-                throw new ArgumentException($"Book with ID {id} not found");
+                throw new BookNotFoundException(id);
             existingBook.Title = bookDto.Title;
             existingBook.PublishedYear = bookDto.PublishedYear;
             existingBook.AuthorId = author.Id;
@@ -69,11 +72,11 @@ namespace BLL.Services
         {
             var author = await _repository.Author.GetByIdAsync(authorId);
             if (author is null)
-                throw new ArgumentException($"Author with ID {authorId} not found");
+                throw new AuthorNotFoundException(authorId);
 
             var book = await _repository.Book.GetBookByAuthorIdAsync(author.Id, id);
             if (book is null)
-                throw new ArgumentException($"Book with ID {id} not found");
+                throw new BookNotFoundException(id);
             await _repository.Book.DeleteAsync(author.Id, id);
             return true;
         }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BLL.Interfaces;
 using Core.Entities.Model;
+using Core.Exceptions;
 using Core.Interfaces;
 using Shared.DTO;
 
@@ -29,7 +30,9 @@ namespace BLL.Services
         public async Task<AuthorDto?> GetByIdAsync(int id)
         {
             var author = await _repository.Author.GetByIdAsync(id);
-            if (author == null) return null;
+            if (author is null) 
+                throw new AuthorNotFoundException(id);
+
             var authorDto = _mapper.Map<AuthorDto>(author);
             return authorDto;
         }
@@ -47,8 +50,8 @@ namespace BLL.Services
         public async Task<AuthorDto?> UpdateAsync(int id, AuthorDto authorDto)
         {
             var existingAuthor = await _repository.Author.GetByIdAsync(id);
-            if (existingAuthor == null)
-                  throw new ArgumentException($"Author with ID {id} not found");
+            if (existingAuthor is null)
+                throw new AuthorNotFoundException(id);
 
             existingAuthor.Name = authorDto.Name;
             existingAuthor.DateOfBirth = authorDto.DateOfBirth;
@@ -63,7 +66,7 @@ namespace BLL.Services
         {
             var author = await _repository.Author.GetByIdAsync(id);
             if (author is null)
-                throw new ArgumentException($"Author with ID {id} not found");
+                throw new AuthorNotFoundException(id);
 
             await _repository.Author.DeleteAsync(id);
             return true;
