@@ -1,7 +1,4 @@
-using BLL.Interfaces;
-using BLL.Services;
 using Core.Interfaces;
-using DAL.InMemoryRepository;
 using NLog;
 using NLog.Web;
 using Task4.Extensions;
@@ -19,6 +16,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
+builder.Services.ConfigureSqlContext(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

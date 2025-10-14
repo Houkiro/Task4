@@ -10,8 +10,8 @@ namespace Task4
         {
             CreateMap<Author, AuthorDto>();
             CreateMap<Book, BookDto>();
-            CreateMap<AuthorDto, Author>();
-            CreateMap<BookDto, Book>();
+            CreateMap<AuthorDtoWithoutId, Author>();
+            CreateMap<BookDtoWithoutId, Book>();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Shared.DTO.Attributes
+namespace Core.Entities.Attributes.DTO
 {
     public class YearAttribute : ValidationAttribute
     {

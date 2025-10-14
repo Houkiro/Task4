@@ -1,12 +1,11 @@
 ﻿using BLL.Interfaces;
-using Core.Entities.Model;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
 
 namespace Task4.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/authors")]
     public class AuthorController : ControllerBase
     {
         private readonly IServiceManager _service;
@@ -18,63 +17,45 @@ namespace Task4.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAuthors()
         {
-            var authors = await _service.AuthorService.GetAllAsync();
+            var authors = await _service.AuthorService.GetAllAsync(trackChanges: false);
             return Ok(authors);
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}", Name = "AuthorById")]
         public async Task<IActionResult> GetAuthorById(int id)
         {
-            var author = await _service.AuthorService.GetByIdAsync(id);
-            if (author is null) 
-                return NotFound();
+            var author = await _service.AuthorService.GetByIdAsync(id, trackChanges: false);
             return Ok(author);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAuthor([FromBody] AuthorDto author)
+        public async Task<IActionResult> CreateAuthor([FromBody] AuthorDtoWithoutId author)
         {
+            if (author is null)
+                return BadRequest("AuthorDto object is null");
             if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
 
-            if (author is null) 
-                return NotFound();
-
-            var created = await _service.AuthorService.CreateAsync(author);
-
-            ModelState.ClearValidationState(nameof(Author));
-            if (!TryValidateModel(author, nameof(Author)))
-                return UnprocessableEntity(ModelState);
-
-            return CreatedAtAction(nameof(GetAuthorById), new { id = created.Id }, created);
+            var createdAuthor = await _service.AuthorService.CreateAsync(author);
+            return CreatedAtRoute("AuthorById", new {id = createdAuthor.Id}, createdAuthor);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorDto author)
+        public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorDtoWithoutId author)
         {
+            if (author is null)
+                return BadRequest("AuthorDto object is null");
             if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
+            await _service.AuthorService.UpdateAsync(id, author, trackChanges: true);
 
-            if (author is null) 
-                return NotFound();
-
-            var updated = await _service.AuthorService.UpdateAsync(id, author);
-            if (updated is null)
-                return NotFound();
-
-            ModelState.ClearValidationState(nameof(Author));
-            if (!TryValidateModel(author, nameof(Author)))
-                return UnprocessableEntity(ModelState);
-
-            return Ok(updated);
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
-            var deleted = await _service.AuthorService.DeleteAsync(id);
-            if (!deleted)
-                return NotFound();
+            await _service.AuthorService.DeleteAsync(id, trackChanges: false);
 
             return NoContent();
         }

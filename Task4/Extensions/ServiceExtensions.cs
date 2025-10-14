@@ -1,8 +1,10 @@
 ﻿using BLL.Interfaces;
 using BLL.Services;
 using Core.Interfaces;
-using DAL.InMemoryRepository;
+using DAL;
+using DAL.Repository;
 using LoggerService;
+using Microsoft.EntityFrameworkCore;
 
 namespace Task4.Extensions
 {
@@ -11,8 +13,11 @@ namespace Task4.Extensions
         public static void ConfigureLoggerService(this IServiceCollection services) =>
             services.AddSingleton<ILoggerManager, LoggerManager>();
         public static void ConfigureRepositoryManager(this IServiceCollection services) =>
-            services.AddSingleton<IRepositoryManager, RepositoryManager>(); // синглтоновский чтобы не стирались данные при запросах пока нет бд
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
         public static void ConfigureServiceManager(this IServiceCollection services) =>
             services.AddScoped<IServiceManager, ServiceManager>();
+        public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration) =>
+            services.AddSqlServer<RepositoryContext>((configuration.GetConnectionString("sqlConnection")));
+
     }
 }

@@ -4,10 +4,9 @@ namespace Core.Interfaces
 {
     public interface IBookRepository
     {
-        Task<IEnumerable<Book>> GetAllBooksByAuthorIdAsync(int authorId);
-        Task<Book?> GetBookByAuthorIdAsync(int authorId, int id);
-        Task<Book> CreateAsync(int authorId, Book book);
-        Task UpdateAsync(int authorId, int id, Book book);
-        Task DeleteAsync(int authorId, int id);
+        Task<IEnumerable<Book>> GetAllBooksByAuthorIdAsync(int authorId, bool trackChanges);
+        Task<Book?> GetBookByAuthorIdAsync(int authorId, int id, bool trackChanges);
+        void CreateAsync(int authorId, Book book);
+        void DeleteAsync(Book book);
     }
 }

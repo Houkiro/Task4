@@ -18,67 +18,65 @@ namespace BLL.Services
             _logger = logger;
             _mapper = mapper;
         }
-        public async Task<IEnumerable<BookDto>> GetAllBooksForAuthorAsync(int authorId)
+        public async Task<IEnumerable<BookDto>> GetAllBooksForAuthorAsync(int authorId, bool trackChanges)
         {
-            var author = await _repository.Author.GetByIdAsync(authorId);
+            var author = await _repository.Author.GetByIdAsync(authorId, trackChanges);
             if (author is null)
                 throw new AuthorNotFoundException(authorId);
 
-            var books = await _repository.Book.GetAllBooksByAuthorIdAsync(authorId);
+            var books = await _repository.Book.GetAllBooksByAuthorIdAsync(authorId, trackChanges);
             var booksDto = _mapper.Map<IEnumerable<BookDto>>(books);
             return booksDto;
         }
 
-        public async Task<BookDto> GetBooksForAuthorByIdAsync(int authorId, int id)
+        public async Task<BookDto> GetBooksForAuthorByIdAsync(int authorId, int id, bool trackChanges)
         {
-            var author = await _repository.Author.GetByIdAsync(authorId);
+            var author = await _repository.Author.GetByIdAsync(authorId, trackChanges);
             if(author is null)
                 throw new AuthorNotFoundException(authorId);
-            var book = await _repository.Book.GetBookByAuthorIdAsync(authorId, id);
+            var book = await _repository.Book.GetBookByAuthorIdAsync(authorId, id, trackChanges);
             if (book is null)
                 throw new BookNotFoundException(id);
             var bookDto = _mapper.Map<BookDto>(book);
             return bookDto;
         }
 
-        public async Task<BookDto> CreateBookForAuthor(int authorId, BookDto bookDto)
+        public async Task<BookDto> CreateBookForAuthor(int authorId, BookDtoWithoutId bookDto, bool trackChanges)
         {
-            var author = await _repository.Author.GetByIdAsync(authorId);
+            var author = await _repository.Author.GetByIdAsync(authorId, trackChanges);
             if (author is null)
                 throw new AuthorNotFoundException(authorId);
             var book = _mapper.Map<Book>(bookDto);
 
-            var created = await _repository.Book.CreateAsync(author.Id, book);
-            var createdDto = _mapper.Map<BookDto>(created);
+            _repository.Book.CreateAsync(author.Id, book);
+            await _repository.SaveAsync();
+            var createdDto = _mapper.Map<BookDto>(book);
             return createdDto;
         }
-        public async Task<BookDto> UpdateBookForAuthorAsync(int authorId, int id, BookDto bookDto)
+        public async Task UpdateBookForAuthorAsync(int authorId, int id, BookDtoWithoutId bookDto, bool trackChanges)
         {
-            var author = await _repository.Author.GetByIdAsync(authorId);
+            var author = await _repository.Author.GetByIdAsync(authorId, trackChanges);
             if (author is null)
                 throw new AuthorNotFoundException(authorId);
-            var existingBook = await _repository.Book.GetBookByAuthorIdAsync(author.Id, id);
-            if (existingBook is null)
+            var bookEntity = await _repository.Book.GetBookByAuthorIdAsync(author.Id, id, trackChanges);
+            if (bookEntity is null)
                 throw new BookNotFoundException(id);
-            existingBook.Title = bookDto.Title;
-            existingBook.PublishedYear = bookDto.PublishedYear;
-            existingBook.AuthorId = author.Id;
-
-            await _repository.Book.UpdateAsync(author.Id, id, existingBook);
-            return _mapper.Map<BookDto>(existingBook);
+            _mapper.Map(bookDto, bookEntity);
+            await _repository.SaveAsync();
         }
 
-        public async Task<bool> DeleteBookForAuthorAsync(int authorId, int id)
+        public async Task DeleteBookForAuthorAsync(int authorId, int id, bool trackChanges)
         {
-            var author = await _repository.Author.GetByIdAsync(authorId);
+            var author = await _repository.Author.GetByIdAsync(authorId, trackChanges);
             if (author is null)
                 throw new AuthorNotFoundException(authorId);
 
-            var book = await _repository.Book.GetBookByAuthorIdAsync(author.Id, id);
+            var book = await _repository.Book.GetBookByAuthorIdAsync(author.Id, id, trackChanges);
             if (book is null)
                 throw new BookNotFoundException(id);
-            await _repository.Book.DeleteAsync(author.Id, id);
-            return true;
+            
+            _repository.Book.DeleteAsync(book);
+            await _repository.SaveAsync();
         }
     }
 }

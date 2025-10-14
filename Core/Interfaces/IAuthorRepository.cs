@@ -4,10 +4,9 @@ namespace Core.Interfaces
 {
     public interface IAuthorRepository
     {
-        Task<IEnumerable<Author>> GetAllAsync();
-        Task<Author?> GetByIdAsync(int id);
-        Task<Author> CreateAsync(Author author);
-        Task UpdateAsync(int id, Author author);
-        Task DeleteAsync(int id);
+        Task<IEnumerable<Author>> GetAllAsync(bool trackChanges);
+        Task<Author> GetByIdAsync(int id, bool trackChanges);
+        void CreateAsync(Author author);
+        void DeleteAsync(Author author);
     }
 }
