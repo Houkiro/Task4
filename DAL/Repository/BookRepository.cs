@@ -11,6 +11,7 @@ namespace DAL.Repository
         public BookRepository(RepositoryContext repositoryContext) : base(repositoryContext)
         {
         }
+
         public async Task<IEnumerable<Book>> GetAllBooksByAuthorIdAsync(int authorId, bool trackChanges) =>
             await FindAll(trackChanges).Where(b => b.AuthorId == authorId)
             .OrderBy(b => b.Title)

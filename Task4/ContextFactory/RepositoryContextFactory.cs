@@ -12,9 +12,11 @@ namespace Task4.ContextFactory
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
+
             var builder = new DbContextOptionsBuilder<RepositoryContext>()
                     .UseSqlServer(configuration.GetConnectionString("sqlConnection"),
                         b => b.MigrationsAssembly("Task4"));
+
             return new RepositoryContext(builder.Options);
         }
     }

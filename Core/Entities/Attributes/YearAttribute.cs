@@ -15,6 +15,7 @@ namespace Core.Entities.Attributes.DTO
             {
                 return year <= DateTime.Today.Year && year > 0;
             }
+
             return false;
         }
     }

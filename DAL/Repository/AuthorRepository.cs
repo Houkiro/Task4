@@ -1,22 +1,27 @@
 ﻿using Core.Entities.Model;
 using Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Shared.DTO;
 
 namespace DAL.Repository
 {
     public class AuthorRepository : RepositoryBase<Author>, IAuthorRepository
     {
         public AuthorRepository(RepositoryContext repositoryContext) : base(repositoryContext) { }
+
         public async Task<IEnumerable<Author>> GetAllAsync(bool trackChanges) =>
             await FindAll(trackChanges).OrderBy(a => a.Name).ToListAsync();
+
         public async Task<Author> GetByIdAsync(int id, bool trackChanges) =>
             await FindByCondition(a => a.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+
         public void CreateAsync(Author author) => Create(author);
+
         public void DeleteAsync(Author author) => Delete(author);
+
 
         public async Task<IEnumerable<Author>> GetAuthorsWithBookCountAsync(bool trackChanges) => 
             await FindAll(trackChanges).OrderByDescending(a => a.Books.Count).ToListAsync();
+
         public async Task<IEnumerable<Author>> GetAllWithBooksAsync(bool trackChanges) =>
             await FindAll(trackChanges)
                   .Include(a => a.Books)

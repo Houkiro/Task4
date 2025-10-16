@@ -12,12 +12,14 @@ namespace BLL.Services
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
+
         public BookService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
         }
+
         public async Task<IEnumerable<BookDto>> GetAllBooksForAuthorAsync(int authorId, bool trackChanges)
         {
             var author = await _repository.Author.GetByIdAsync(authorId, trackChanges);
@@ -26,6 +28,7 @@ namespace BLL.Services
 
             var books = await _repository.Book.GetAllBooksByAuthorIdAsync(authorId, trackChanges);
             var booksDto = _mapper.Map<IEnumerable<BookDto>>(books);
+
             return booksDto;
         }
 
@@ -38,6 +41,7 @@ namespace BLL.Services
             if (book is null)
                 throw new BookNotFoundException(id);
             var bookDto = _mapper.Map<BookDto>(book);
+
             return bookDto;
         }
 
@@ -51,6 +55,7 @@ namespace BLL.Services
             _repository.Book.CreateAsync(author.Id, book);
             await _repository.SaveAsync();
             var createdDto = _mapper.Map<BookDto>(book);
+
             return createdDto;
         }
         public async Task UpdateBookForAuthorAsync(int authorId, int id, BookDtoWithoutId bookDto, bool trackChanges)

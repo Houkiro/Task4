@@ -24,6 +24,7 @@ namespace BLL.Services
         {
             var authors = await _repository.Author.GetAllAsync(trackChanges);
             var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
+
             return authorsDto;
         }
 
@@ -34,6 +35,7 @@ namespace BLL.Services
                 throw new AuthorNotFoundException(id);
 
             var authorDto = _mapper.Map<AuthorDto>(author);
+
             return authorDto;
         }
 
@@ -44,6 +46,7 @@ namespace BLL.Services
 
             await _repository.SaveAsync();
             var createdDto = _mapper.Map<AuthorDto>(author);
+
             return createdDto;
         }
 
@@ -79,16 +82,20 @@ namespace BLL.Services
 
             return result;
         }
+
         public async Task<IEnumerable<AuthorDto>> GetAuthorsWithBooksAfterYearAsync(int year, bool trackChanges)
         {
             var authors = await _repository.Author.GetAuthorsWithBooksAfterYearAsync(year, trackChanges);
             var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
+
             return authorsDto;
         }
+
         public async Task<IEnumerable<AuthorDto>> FindAuthorsByNameAsync(string namePart, bool trackChanges)
         {
             var authors = await _repository.Author.FindAuthorsByNameAsync(namePart, trackChanges);
             var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
+
             return authorsDto;
         }
     }

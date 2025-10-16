@@ -21,8 +21,10 @@ namespace Task4.Controllers
             var author = await _service.AuthorService.GetByIdAsync(authorId, trackChanges: false);
 
             var books = await _service.BookService.GetAllBooksForAuthorAsync(authorId, trackChanges: false);
+
             return Ok(books);
         }
+
         [HttpGet("{id:int}", Name = "GetBookForAuthor")]
         public async Task<IActionResult> GetBookByAuthorId(int authorId, int id)
         {
@@ -32,6 +34,7 @@ namespace Task4.Controllers
 
             return Ok(book);
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateBookForAuthor([FromBody] BookDtoWithoutId book, int authorId)
         {
@@ -45,6 +48,7 @@ namespace Task4.Controllers
             return CreatedAtAction("GetBookForAuthor", new { authorId = createdBook.Id, id = createdBook.Id }, createdBook);
 
         }
+
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateBook(int authorId, int id, [FromBody] BookDtoWithoutId book)
         {
@@ -53,12 +57,15 @@ namespace Task4.Controllers
             if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
             await _service.BookService.UpdateBookForAuthorAsync(authorId, id, book, trackChanges: true);
+
             return NoContent();
         }
+
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteBook(int authorId, int id)
         {
             await _service.BookService.DeleteBookForAuthorAsync(authorId, id, trackChanges: false);
+
             return NoContent();
         }
     }

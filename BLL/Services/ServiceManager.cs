@@ -14,7 +14,9 @@ namespace BLL.Services
             _authorService = new Lazy<IAuthorService>(() => new AuthorService(repositoryManager, logger, mapper));
             _bookService = new Lazy<IBookService>(() => new BookService(repositoryManager, logger, mapper));
         }
+
         public IAuthorService AuthorService => _authorService.Value;
+
         public IBookService BookService => _bookService.Value;
     }
 }
