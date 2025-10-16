@@ -37,7 +37,7 @@ namespace Task4.Controllers
                 return UnprocessableEntity(ModelState);
 
             var createdAuthor = await _service.AuthorService.CreateAsync(author);
-            return CreatedAtRoute("AuthorById", new {id = createdAuthor.Id}, createdAuthor);
+            return CreatedAtRoute("AuthorById", new { id = createdAuthor.Id }, createdAuthor);
         }
 
         [HttpPut("{id:int}")]
@@ -59,6 +59,23 @@ namespace Task4.Controllers
 
             return NoContent();
         }
-
+        [HttpGet("with-book-count")]
+        public async Task<IActionResult> GetAuthorsWithBookCount()
+        {
+            var authors = await _service.AuthorService.GetAuthorsWithBookCountAsync(trackChanges: false);
+            return Ok(authors);
+        }
+        [HttpGet("books/after/{year:int}")]
+        public async Task<IActionResult> GetAuthorsWithBooksAfterYear(int year)
+        {
+            var authors = await _service.AuthorService.GetAuthorsWithBooksAfterYearAsync(year, trackChanges: false);
+            return Ok(authors);
+        }
+        [HttpGet("{namePart}")]
+        public async Task<IActionResult> FindAuthorsByName(string namePart)
+        {
+            var authors = await _service.AuthorService.FindAuthorsByNameAsync(namePart, trackChanges: false);
+            return Ok(authors);
+        }
     }
 }

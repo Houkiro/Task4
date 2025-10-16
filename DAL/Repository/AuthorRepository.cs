@@ -1,6 +1,7 @@
 ﻿using Core.Entities.Model;
 using Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Shared.DTO;
 
 namespace DAL.Repository
 {
@@ -13,5 +14,18 @@ namespace DAL.Repository
             await FindByCondition(a => a.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
         public void CreateAsync(Author author) => Create(author);
         public void DeleteAsync(Author author) => Delete(author);
+
+        public async Task<IEnumerable<Author>> GetAuthorsWithBookCountAsync(bool trackChanges) => 
+            await FindAll(trackChanges).OrderByDescending(a => a.Books.Count).ToListAsync();
+        public async Task<IEnumerable<Author>> GetAllWithBooksAsync(bool trackChanges) =>
+            await FindAll(trackChanges)
+                  .Include(a => a.Books)
+                  .ToListAsync();
+
+        public async Task<IEnumerable<Author>> GetAuthorsWithBooksAfterYearAsync(int year, bool trackChanges) =>
+            await FindAll(trackChanges).Where(a => a.Books.Any(b => b.PublishedYear > year)).ToListAsync();
+
+        public async Task<IEnumerable<Author>> FindAuthorsByNameAsync(string namePart, bool trackChanges) =>
+            await FindAll(trackChanges).Where(a => a.Name.Contains(namePart)).ToListAsync();
     }
 }
