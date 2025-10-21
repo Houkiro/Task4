@@ -1,7 +1,6 @@
-﻿using BLL.Interfaces;
-using Core.Entities.Model;
+﻿using BLL.DTO;
+using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Shared.DTO;
 
 namespace Task4.Controllers
 {
@@ -10,6 +9,7 @@ namespace Task4.Controllers
     public class BookController : ControllerBase
     {
         private readonly IServiceManager _service;
+
         public BookController(IServiceManager service)
         {
             _service = service;
@@ -18,54 +18,41 @@ namespace Task4.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllBooks(int authorId)
         {
-            var author = await _service.AuthorService.GetByIdAsync(authorId, trackChanges: false);
-
-            var books = await _service.BookService.GetAllBooksForAuthorAsync(authorId, trackChanges: false);
-
+            var books = await _service.BookService.GetAllBooksForAuthorAsync(authorId);
             return Ok(books);
         }
 
         [HttpGet("{id:int}", Name = "GetBookForAuthor")]
-        public async Task<IActionResult> GetBookByAuthorId(int authorId, int id)
+        public async Task<IActionResult> GetBookById(int authorId, int id)
         {
-            var author = await _service.AuthorService.GetByIdAsync(authorId, trackChanges: false);
-
-            var book = await _service.BookService.GetBooksForAuthorByIdAsync(authorId, id, trackChanges: false);
-
+            var book = await _service.BookService.GetBooksForAuthorByIdAsync(authorId, id);
             return Ok(book);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBookForAuthor([FromBody] BookDtoWithoutId book, int authorId)
+        public async Task<IActionResult> CreateBookForAuthor(int authorId, [FromBody] CreateBookModelDto book)
         {
-            var author = await _service.AuthorService.GetByIdAsync(authorId, trackChanges: false);
-            if (book is null)
-                return BadRequest("BookDto object is null");
-            if (!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
-            var createdBook = await _service.BookService.CreateBookForAuthor(authorId, book, trackChanges: false);
+            if (book is null) return BadRequest("Book object is null");
+            if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
 
-            return CreatedAtAction("GetBookForAuthor", new { authorId = createdBook.Id, id = createdBook.Id }, createdBook);
-
+            var createdBook = await _service.BookService.CreateBookForAuthor(authorId, book);
+            return CreatedAtRoute("GetBookForAuthor", new { authorId = authorId, id = createdBook.Id }, createdBook);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateBook(int authorId, int id, [FromBody] BookDtoWithoutId book)
+        public async Task<IActionResult> UpdateBook(int authorId, int id, [FromBody] UpdateBookModelDto book)
         {
-            if (book is null)
-                return BadRequest("BookDto object is null");
-            if (!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
-            await _service.BookService.UpdateBookForAuthorAsync(authorId, id, book, trackChanges: true);
+            if (book is null) return BadRequest("Book object is null");
+            if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
 
+            await _service.BookService.UpdateBookForAuthorAsync(authorId, id, book);
             return NoContent();
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteBook(int authorId, int id)
         {
-            await _service.BookService.DeleteBookForAuthorAsync(authorId, id, trackChanges: false);
-
+            await _service.BookService.DeleteBookForAuthorAsync(authorId, id);
             return NoContent();
         }
     }

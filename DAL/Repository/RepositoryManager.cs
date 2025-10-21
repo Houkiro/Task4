@@ -1,4 +1,4 @@
-﻿using Core.Interfaces;
+﻿using DAL.Interfaces;
 
 namespace DAL.Repository
 {

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BLL.Interfaces;
-using Core.Interfaces;
+using DAL.Interfaces;
 
 namespace BLL.Services
 {

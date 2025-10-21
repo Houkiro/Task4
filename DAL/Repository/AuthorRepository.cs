@@ -1,5 +1,5 @@
-﻿using Core.Entities.Model;
-using Core.Interfaces;
+﻿using DAL.Entities.Model;
+using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repository
@@ -8,29 +8,29 @@ namespace DAL.Repository
     {
         public AuthorRepository(RepositoryContext repositoryContext) : base(repositoryContext) { }
 
-        public async Task<IEnumerable<Author>> GetAllAsync(bool trackChanges) =>
-            await FindAll(trackChanges).OrderBy(a => a.Name).ToListAsync();
+        public async Task<IEnumerable<Author>> GetAllAsync() =>
+            await FindAll().OrderBy(a => a.Name).ToListAsync();
 
-        public async Task<Author> GetByIdAsync(int id, bool trackChanges) =>
-            await FindByCondition(a => a.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+        public async Task<Author> GetByIdAsync(int id) =>
+            await FindByCondition(a => a.Id.Equals(id)).SingleOrDefaultAsync();
 
         public void CreateAsync(Author author) => Create(author);
 
         public void DeleteAsync(Author author) => Delete(author);
 
 
-        public async Task<IEnumerable<Author>> GetAuthorsWithBookCountAsync(bool trackChanges) => 
-            await FindAll(trackChanges).OrderByDescending(a => a.Books.Count).ToListAsync();
+        public async Task<IEnumerable<Author>> GetAuthorsWithBookCountAsync() =>
+            await FindAll().OrderByDescending(a => a.Books.Count).ToListAsync();
 
-        public async Task<IEnumerable<Author>> GetAllWithBooksAsync(bool trackChanges) =>
-            await FindAll(trackChanges)
+        public async Task<IEnumerable<Author>> GetAllWithBooksAsync() =>
+            await FindAll()
                   .Include(a => a.Books)
                   .ToListAsync();
 
-        public async Task<IEnumerable<Author>> GetAuthorsWithBooksAfterYearAsync(int year, bool trackChanges) =>
-            await FindAll(trackChanges).Where(a => a.Books.Any(b => b.PublishedYear > year)).ToListAsync();
+        public async Task<IEnumerable<Author>> GetAuthorsWithBooksAfterYearAsync(int year) =>
+            await FindAll().Where(a => a.Books.Any(b => b.PublishedYear > year)).ToListAsync();
 
-        public async Task<IEnumerable<Author>> FindAuthorsByNameAsync(string namePart, bool trackChanges) =>
-            await FindAll(trackChanges).Where(a => a.Name.Contains(namePart)).ToListAsync();
+        public async Task<IEnumerable<Author>> FindAuthorsByNameAsync(string namePart) =>
+            await FindAll().Where(a => a.Name.Contains(namePart)).ToListAsync();
     }
 }

@@ -1,4 +1,5 @@
-using Core.Interfaces;
+using BLL.Mapping;
+using DAL.Interfaces;
 using NLog;
 using NLog.Web;
 using Task4.Extensions;
@@ -12,7 +13,7 @@ builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 builder.Services.ConfigureLoggerService();
 
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();

@@ -1,6 +1,6 @@
-﻿using Core.ErrorModel;
-using Core.Exceptions;
-using Core.Interfaces;
+﻿using BLL.ErrorModel;
+using BLL.Exceptions;
+using DAL.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
 

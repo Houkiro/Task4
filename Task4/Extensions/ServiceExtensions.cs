@@ -1,7 +1,6 @@
 ﻿using BLL.Interfaces;
 using BLL.Services;
-using Core.Interfaces;
-using DAL;
+using DAL.Interfaces;
 using DAL.Repository;
 using LoggerService;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +19,11 @@ namespace Task4.Extensions
             services.AddScoped<IServiceManager, ServiceManager>();
 
         public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration) =>
-            services.AddSqlServer<RepositoryContext>((configuration.GetConnectionString("sqlConnection")));
-
+            services.AddDbContext<RepositoryContext>(options =>
+                options.UseSqlServer(
+                    configuration.GetConnectionString("sqlConnection"),
+                    sqlOptions => sqlOptions.MigrationsAssembly("DAL")
+                )
+            );
     }
 }

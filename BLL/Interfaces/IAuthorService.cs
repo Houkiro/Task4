@@ -1,24 +1,23 @@
-﻿using Core.Entities.Attributes.DTO;
-using Shared.DTO;
+﻿using BLL.DTO;
 
 namespace BLL.Interfaces
 {
     public interface IAuthorService
     {
-        Task<IEnumerable<AuthorDto>> GetAllAsync(bool trackChanges);
+        Task<IEnumerable<AuthorResponseDto>> GetAllAsync();
 
-        Task<AuthorDto> GetByIdAsync(int id, bool trackChanges);
+        Task<AuthorResponseDto> GetByIdAsync(int id);
 
-        Task<AuthorDto> CreateAsync(AuthorDtoWithoutId author);
+        Task<AuthorResponseDto> CreateAsync(CreateAuthorModelDto author);
 
-        Task UpdateAsync(int id, AuthorDtoWithoutId author, bool trackChanges);
+        Task UpdateAsync(int id, UpdateAuthorModelDto author);
 
-        Task DeleteAsync(int id, bool trackChanges);
+        Task DeleteAsync(int id);
 
-        Task<IEnumerable<AuthorWithBookCountDto>> GetAuthorsWithBookCountAsync(bool trackChanges);
+        Task<IEnumerable<AuthorWithBookCountDto>> GetAuthorsWithBookCountAsync();
 
-        Task<IEnumerable<AuthorDto>> GetAuthorsWithBooksAfterYearAsync(int year, bool trackChanges);
+        Task<IEnumerable<AuthorResponseDto>> GetAuthorsWithBooksAfterYearAsync(int year);
 
-        Task<IEnumerable<AuthorDto>> FindAuthorsByNameAsync(string namePart, bool trackChanges);
+        Task<IEnumerable<AuthorResponseDto>> FindAuthorsByNameAsync(string namePart);
     }
 }

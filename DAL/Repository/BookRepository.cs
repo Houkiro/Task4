@@ -1,8 +1,6 @@
-﻿using Core.Entities.Model;
-using Core.Exceptions;
-using Core.Interfaces;
+﻿using DAL.Entities.Model;
+using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace DAL.Repository
 {
@@ -12,13 +10,13 @@ namespace DAL.Repository
         {
         }
 
-        public async Task<IEnumerable<Book>> GetAllBooksByAuthorIdAsync(int authorId, bool trackChanges) =>
-            await FindAll(trackChanges).Where(b => b.AuthorId == authorId)
+        public async Task<IEnumerable<Book>> GetAllBooksByAuthorIdAsync(int authorId) =>
+            await FindAll().Where(b => b.AuthorId == authorId)
             .OrderBy(b => b.Title)
             .ToListAsync();
 
-        public async Task<Book?> GetBookByAuthorIdAsync(int authorId, int id, bool trackChanges) =>
-            await FindByCondition(b => b.AuthorId.Equals(authorId) && b.Id.Equals(id), trackChanges)
+        public async Task<Book?> GetBookByAuthorIdAsync(int authorId, int id) =>
+            await FindByCondition(b => b.AuthorId.Equals(authorId) && b.Id.Equals(id))
             .SingleOrDefaultAsync();
 
         public void CreateAsync(int authorId, Book book)

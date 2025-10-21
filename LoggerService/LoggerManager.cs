@@ -1,11 +1,11 @@
-﻿using Core.Interfaces;
+﻿using DAL.Interfaces;
 using NLog;
 
 namespace LoggerService
 {
     public class LoggerManager : ILoggerManager
     {
-        private static ILogger logger = LogManager.GetCurrentClassLogger();
+        private static NLog.ILogger logger = LogManager.GetCurrentClassLogger();
         public LoggerManager()
         {
         }

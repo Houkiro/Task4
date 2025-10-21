@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using BLL.DTO;
+using BLL.Exceptions;
 using BLL.Interfaces;
-using Core.Entities.Model;
-using Core.Exceptions;
-using Core.Interfaces;
-using Shared.DTO;
+using DAL.Entities.Model;
+using DAL.Interfaces;
 
 namespace BLL.Services
 {
@@ -20,83 +20,68 @@ namespace BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<AuthorDto>> GetAllAsync(bool trackChanges)
+        public async Task<IEnumerable<AuthorResponseDto>> GetAllAsync()
         {
-            var authors = await _repository.Author.GetAllAsync(trackChanges);
-            var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
-
-            return authorsDto;
+            var authors = await _repository.Author.GetAllAsync();
+            return _mapper.Map<IEnumerable<AuthorResponseDto>>(authors);
         }
 
-        public async Task<AuthorDto> GetByIdAsync(int id, bool trackChanges)
+        public async Task<AuthorResponseDto> GetByIdAsync(int id)
         {
-            var author = await _repository.Author.GetByIdAsync(id, trackChanges);
+            var author = await _repository.Author.GetByIdAsync(id);
             if (author is null)
                 throw new AuthorNotFoundException(id);
 
-            var authorDto = _mapper.Map<AuthorDto>(author);
-
-            return authorDto;
+            return _mapper.Map<AuthorResponseDto>(author);
         }
 
-        public async Task<AuthorDto> CreateAsync(AuthorDtoWithoutId authorDto)
+        public async Task<AuthorResponseDto> CreateAsync(CreateAuthorModelDto AuthorResponseDto)
         {
-            var author = _mapper.Map<Author>(authorDto);
-            _repository.Author.CreateAsync(author);
+            var author = _mapper.Map<Author>(AuthorResponseDto);
+            _repository.Author.Create(author);
 
             await _repository.SaveAsync();
-            var createdDto = _mapper.Map<AuthorDto>(author);
 
-            return createdDto;
+            return _mapper.Map<AuthorResponseDto>(author);
         }
 
-        public async Task UpdateAsync(int id, AuthorDtoWithoutId authorDto, bool trackChanges)
+        public async Task UpdateAsync(int id, UpdateAuthorModelDto AuthorResponseDto)
         {
-            var existingAuthor = await _repository.Author.GetByIdAsync(id, trackChanges);
+            var existingAuthor = await _repository.Author.GetByIdAsync(id);
             if (existingAuthor is null)
                 throw new AuthorNotFoundException(id);
-            _mapper.Map(authorDto, existingAuthor);
+            _mapper.Map(AuthorResponseDto, existingAuthor);
             await _repository.SaveAsync();
         }
 
-        public async Task DeleteAsync(int id, bool trackChanges)
+        public async Task DeleteAsync(int id)
         {
-            var authorEntity = await _repository.Author.GetByIdAsync(id, trackChanges);
+            var authorEntity = await _repository.Author.GetByIdAsync(id);
             if (authorEntity is null)
                 throw new AuthorNotFoundException(id);
 
-            _repository.Author.DeleteAsync(authorEntity);
+            _repository.Author.Delete(authorEntity);
             await _repository.SaveAsync();
         }
 
-        public async Task<IEnumerable<AuthorWithBookCountDto>> GetAuthorsWithBookCountAsync(bool trackChanges)
+        public async Task<IEnumerable<AuthorWithBookCountDto>> GetAuthorsWithBookCountAsync()
         {
-            var authors = await _repository.Author.GetAllWithBooksAsync(trackChanges);
+            var authors = await _repository.Author.GetAllWithBooksAsync();
 
-            var result = authors.Select(a => new AuthorWithBookCountDto
-            {
-                AuthorId = a.Id,
-                Name = a.Name,
-                BookCount = a.Books?.Count ?? 0
-            });
-
-            return result;
+            return _mapper.Map<IEnumerable<AuthorWithBookCountDto>>(authors);
         }
 
-        public async Task<IEnumerable<AuthorDto>> GetAuthorsWithBooksAfterYearAsync(int year, bool trackChanges)
-        {
-            var authors = await _repository.Author.GetAuthorsWithBooksAfterYearAsync(year, trackChanges);
-            var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
 
-            return authorsDto;
+        public async Task<IEnumerable<AuthorResponseDto>> GetAuthorsWithBooksAfterYearAsync(int year)
+        {
+            var authors = await _repository.Author.GetAuthorsWithBooksAfterYearAsync(year);
+            return _mapper.Map<IEnumerable<AuthorResponseDto>>(authors);
         }
 
-        public async Task<IEnumerable<AuthorDto>> FindAuthorsByNameAsync(string namePart, bool trackChanges)
+        public async Task<IEnumerable<AuthorResponseDto>> FindAuthorsByNameAsync(string namePart)
         {
-            var authors = await _repository.Author.FindAuthorsByNameAsync(namePart, trackChanges);
-            var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
-
-            return authorsDto;
+            var authors = await _repository.Author.FindAuthorsByNameAsync(namePart);
+            return _mapper.Map<IEnumerable<AuthorResponseDto>>(authors);
         }
     }
 }

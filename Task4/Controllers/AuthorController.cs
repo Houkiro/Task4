@@ -1,6 +1,6 @@
-﻿using BLL.Interfaces;
+﻿using BLL.DTO;
+using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Shared.DTO;
 
 namespace Task4.Controllers
 {
@@ -9,81 +9,70 @@ namespace Task4.Controllers
     public class AuthorController : ControllerBase
     {
         private readonly IServiceManager _service;
+
         public AuthorController(IServiceManager service)
         {
             _service = service;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAuthors()
+        public async Task<IActionResult> GetAuthors([FromQuery] int? booksAfterYear = null)
         {
-            var authors = await _service.AuthorService.GetAllAsync(trackChanges: false);
+            if (booksAfterYear.HasValue)
+            {
+                var authorsWithBooksAfterYear = await _service.AuthorService.GetAuthorsWithBooksAfterYearAsync(booksAfterYear.Value);
+                return Ok(authorsWithBooksAfterYear);
+            }
 
+            var authors = await _service.AuthorService.GetAllAsync();
             return Ok(authors);
         }
 
         [HttpGet("{id:int}", Name = "AuthorById")]
         public async Task<IActionResult> GetAuthorById(int id)
         {
-            var author = await _service.AuthorService.GetByIdAsync(id, trackChanges: false);
-
+            var author = await _service.AuthorService.GetByIdAsync(id);
             return Ok(author);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAuthor([FromBody] AuthorDtoWithoutId author)
+        public async Task<IActionResult> CreateAuthor([FromBody] CreateAuthorModelDto author)
         {
-            if (author is null)
-                return BadRequest("AuthorDto object is null");
-            if (!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
+            if (author is null) return BadRequest("Author object is null");
+            if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
 
             var createdAuthor = await _service.AuthorService.CreateAsync(author);
-
             return CreatedAtRoute("AuthorById", new { id = createdAuthor.Id }, createdAuthor);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorDtoWithoutId author)
+        public async Task<IActionResult> UpdateAuthor(int id, [FromBody] UpdateAuthorModelDto author)
         {
-            if (author is null)
-                return BadRequest("AuthorDto object is null");
-            if (!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
-            await _service.AuthorService.UpdateAsync(id, author, trackChanges: true);
+            if (author is null) return BadRequest("Author object is null");
+            if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
 
+            await _service.AuthorService.UpdateAsync(id, author);
             return NoContent();
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
-            await _service.AuthorService.DeleteAsync(id, trackChanges: false);
-
+            await _service.AuthorService.DeleteAsync(id);
             return NoContent();
         }
 
-        [HttpGet("with-book-count")]
+        [HttpGet("book-counts")]
         public async Task<IActionResult> GetAuthorsWithBookCount()
         {
-            var authors = await _service.AuthorService.GetAuthorsWithBookCountAsync(trackChanges: false);
-
+            var authors = await _service.AuthorService.GetAuthorsWithBookCountAsync();
             return Ok(authors);
         }
 
-        [HttpGet("books/after/{year:int}")]
-        public async Task<IActionResult> GetAuthorsWithBooksAfterYear(int year)
+        [HttpGet("search")]
+        public async Task<IActionResult> FindAuthorsByName([FromQuery] string namePart)
         {
-            var authors = await _service.AuthorService.GetAuthorsWithBooksAfterYearAsync(year, trackChanges: false);
-
-            return Ok(authors);
-        }
-
-        [HttpGet("{namePart}")]
-        public async Task<IActionResult> FindAuthorsByName(string namePart)
-        {
-            var authors = await _service.AuthorService.FindAuthorsByNameAsync(namePart, trackChanges: false);
-
+            var authors = await _service.AuthorService.FindAuthorsByNameAsync(namePart);
             return Ok(authors);
         }
     }

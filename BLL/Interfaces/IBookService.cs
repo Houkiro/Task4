@@ -1,17 +1,17 @@
-﻿using Shared.DTO;
+﻿using BLL.DTO;
 
 namespace BLL.Interfaces
 {
     public interface IBookService
     {
-        Task<IEnumerable<BookDto>> GetAllBooksForAuthorAsync(int authorId, bool trackChanges);
+        Task<IEnumerable<BookResponseDto>> GetAllBooksForAuthorAsync(int authorId);
 
-        Task<BookDto> GetBooksForAuthorByIdAsync(int authorId, int id, bool trackChanges);
+        Task<BookResponseDto> GetBooksForAuthorByIdAsync(int authorId, int id);
 
-        Task<BookDto> CreateBookForAuthor(int authorId, BookDtoWithoutId book, bool trackChanges);
+        Task<BookResponseDto> CreateBookForAuthor(int authorId, CreateBookModelDto book);
 
-        Task UpdateBookForAuthorAsync(int authorId, int id, BookDtoWithoutId book, bool trackChanges);
+        Task UpdateBookForAuthorAsync(int authorId, int id, UpdateBookModelDto book);
 
-        Task DeleteBookForAuthorAsync(int authorId, int id, bool trackChanges);
+        Task DeleteBookForAuthorAsync(int authorId, int id);
     }
 }
